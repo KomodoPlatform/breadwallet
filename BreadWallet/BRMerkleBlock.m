@@ -236,6 +236,8 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         if (CFSwapInt32LittleToHost(_blockHash.u32[i]) < CFSwapInt32LittleToHost(t.u32[i])) break;
         if (CFSwapInt32LittleToHost(_blockHash.u32[i]) > CFSwapInt32LittleToHost(t.u32[i]))
         {
+            if ( COIN_IS_ZCASH != 0 )
+                break;
             int32_t j;
             for (j=31; j>=0; j--)
                 printf("%02x",t.u8[j]);
@@ -244,8 +246,6 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
                 printf("%02x",_blockHash.u8[j]);
             printf(" _blockHash\n");
             NSLog(@"  hashcmp check failed i.%d",i);
-            if ( COIN_IS_ZCASH != 0 )
-                break;
             return NO;
         }
     }
