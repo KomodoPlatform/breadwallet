@@ -27,6 +27,14 @@
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 
+uint8_t BITCOIN_PUBKEY_ADDRESS = 60;
+uint8_t BITCOIN_SCRIPT_ADDRESS = 85;
+uint8_t BITCOIN_PRIVKEY = 188;
+uint16_t BITCOIN_STANDARD_PORT = 7770;
+uint32_t BITCOIN_MAGIC_NUMBER = 0xf9eee48d;
+#define SATOSHIS           100000000LL
+uint64_t MAX_MONEY = (200000000LL * SATOSHIS);
+
 static const UniChar base58chars[] = {
     '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P',
     'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n',
