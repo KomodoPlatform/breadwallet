@@ -39,8 +39,10 @@
 #define MAX_MSG_LENGTH     0x02000000
 #define MAX_GETDATA_HASHES 50000
 #define ENABLED_SERVICES   0     // we don't provide full blocks to remote nodes
-#define PROTOCOL_VERSION   70013
-#define MIN_PROTO_VERSION  70002 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
+//#define PROTOCOL_VERSION   70013
+//#define MIN_PROTO_VERSION  70002 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
+extern int32_t PROTOCOL_VERSION;
+extern int32_t MIN_PROTO_VERSION;
 #define LOCAL_HOST         0x7f000001
 #define CONNECT_TIMEOUT    3.0
 #define MEMPOOL_TIMEOUT    5.0
@@ -267,6 +269,7 @@ services:(uint64_t)services
 - (void)error:(NSString *)message, ... NS_FORMAT_FUNCTION(1,2)
 {
     va_list args;
+    NSLog(@"%@:%u error %@", self.host, self.port,message);
 
     va_start(args, message);
     [self disconnectWithError:[NSError errorWithDomain:@"BreadWallet" code:500
@@ -542,6 +545,7 @@ services:(uint64_t)services
 
 - (void)acceptMessage:(NSData *)message type:(NSString *)type
 {
+    //NSLog(@"acceptMessage %@:%u len:%u, %@", self.host,self.port,(int)message.length,type);
     if (self.currentBlock && ! [MSG_TX isEqual:type]) { // if we receive a non-tx message, merkleblock is done
         UInt256 hash = self.currentBlock.blockHash;
         
@@ -570,7 +574,6 @@ services:(uint64_t)services
 - (void)acceptVersionMessage:(NSData *)message
 {
     NSUInteger l = 0;
-    
     if (message.length < 85) {
         [self error:@"malformed version message, length is %u, should be > 84", (int)message.length];
         return;
@@ -706,6 +709,7 @@ services:(uint64_t)services
     }
     else if (self.currentBlockHeight > 0 && blockHashes.count > 2 && blockHashes.count < 500 &&
              self.currentBlockHeight + self.knownBlockHashes.count + blockHashes.count < self.lastblock) {
+        NSLog(@"non-standard inv, %u is fewer block hashes than expected", (int)blockHashes.count);
         [self error:@"non-standard inv, %u is fewer block hashes than expected", (int)blockHashes.count];
         return;
     }
@@ -759,6 +763,7 @@ services:(uint64_t)services
         [self sendPingMessageWithPongHandler:self.mempoolCompletion];
         self.mempoolCompletion = nil;
     }
+    NSLog(@"finished inv");
 }
 
 - (void)acceptTxMessage:(NSData *)message

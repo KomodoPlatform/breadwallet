@@ -28,7 +28,8 @@
 #import "NSData+Bitcoin.h"
 
 #define MAX_TIME_DRIFT    (2*60*60)     // the furthest in the future a block is allowed to be timestamped
-#define MAX_PROOF_OF_WORK 0x1d00ffffu   // highest value for difficulty target (higher values are less difficult)
+//#define MAX_PROOF_OF_WORK 0x1d00ffffu   // highest value for difficulty target (higher values are less difficult)
+extern uint32_t MAX_PROOF_OF_WORK;
 #define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments
 
 // from https://en.bitcoin.it/wiki/Protocol_specification#Merkle_Trees
@@ -82,6 +83,7 @@ inline static int ceil_log2(int x)
 
 - (instancetype)initWithMessage:(NSData *)message
 {
+    //NSLog(@"initwithMessage");
     if (! (self = [self init])) return nil;
     
     if (message.length < 80) return nil;
@@ -89,33 +91,62 @@ inline static int ceil_log2(int x)
     NSUInteger off = 0, l = 0, len = 0;
     NSMutableData *d = [NSMutableData data];
 
-    _version = [message UInt32AtOffset:off];
-    off += sizeof(uint32_t);
-    _prevBlock = [message hashAtOffset:off];
-    off += sizeof(UInt256);
-    _merkleRoot = [message hashAtOffset:off];
-    off += sizeof(UInt256);
-    _timestamp = [message UInt32AtOffset:off];
-    off += sizeof(uint32_t);
-    _target = [message UInt32AtOffset:off];
-    off += sizeof(uint32_t);
-    _nonce = [message UInt32AtOffset:off];
-    off += sizeof(uint32_t);
-    _totalTransactions = [message UInt32AtOffset:off];
-    off += sizeof(uint32_t);
-    len = (NSUInteger)[message varIntAtOffset:off length:&l]*sizeof(UInt256);
-    off += l;
-    _hashes = (off + len > message.length) ? nil : [message subdataWithRange:NSMakeRange(off, len)];
-    off += len;
-    _flags = [message dataAtOffset:off length:&l];
-    _height = BLOCK_UNKNOWN_HEIGHT;
-    
-    [d appendUInt32:_version];
-    [d appendBytes:&_prevBlock length:sizeof(_prevBlock)];
-    [d appendBytes:&_merkleRoot length:sizeof(_merkleRoot)];
-    [d appendUInt32:_timestamp];
-    [d appendUInt32:_target];
-    [d appendUInt32:_nonce];
+    if ( COIN_IS_ZCASH != 0 )
+    {
+        _version = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        _prevBlock = [message hashAtOffset:off], off += sizeof(UInt256);
+        _merkleRoot = [message hashAtOffset:off], off += sizeof(UInt256);
+        _reserved = [message hashAtOffset:off], off += sizeof(UInt256);
+        _timestamp = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        _target = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        _bignonce = [message hashAtOffset:off], off += sizeof(UInt256);
+        _numelements = 1344, off += 3; //(NSUInteger)[message varIntAtOffset:off length:&l]*sizeof(UInt256), off += l;
+        _solution = [message UInt8_1344AtOffset:off], off += sizeof(UInt8_1344);
+        /*struct iguana_msgzblockhdr
+        {
+            uint32_t version;
+            bits256 prev_block,merkle_root,reserved;
+            uint32_t timestamp,bits;
+            bits256 bignonce;
+            uint8_t var_numelements[3],solution[ZCASH_SOLUTION_ELEMENTS];
+        }*/
+        _totalTransactions = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        len = (NSUInteger)[message varIntAtOffset:off length:&l]*sizeof(UInt256), off += l;
+        _hashes = (off + len > message.length) ? nil : [message subdataWithRange:NSMakeRange(off, len)], off += len;
+        _flags = [message dataAtOffset:off length:&l];
+        _height = BLOCK_UNKNOWN_HEIGHT;
+
+        [d appendUInt32:_version];
+        [d appendBytes:&_prevBlock length:sizeof(_prevBlock)];
+        [d appendBytes:&_merkleRoot length:sizeof(_merkleRoot)];
+        [d appendBytes:&_reserved length:sizeof(_reserved)];
+        [d appendUInt32:_timestamp];
+        [d appendUInt32:_target];
+        [d appendBytes:&_bignonce length:sizeof(_bignonce)];
+        [d appendVarInt:_numelements];
+        [d appendBytes:&_solution length:sizeof(_solution)];
+    }
+    else
+    {
+        _version = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        _prevBlock = [message hashAtOffset:off], off += sizeof(UInt256);
+        _merkleRoot = [message hashAtOffset:off], off += sizeof(UInt256);
+        _timestamp = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        _target = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        _nonce = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        _totalTransactions = [message UInt32AtOffset:off], off += sizeof(uint32_t);
+        len = (NSUInteger)[message varIntAtOffset:off length:&l]*sizeof(UInt256), off += l;
+        _hashes = (off + len > message.length) ? nil : [message subdataWithRange:NSMakeRange(off, len)], off += len;
+        _flags = [message dataAtOffset:off length:&l];
+        _height = BLOCK_UNKNOWN_HEIGHT;
+        
+        [d appendUInt32:_version];
+        [d appendBytes:&_prevBlock length:sizeof(_prevBlock)];
+        [d appendBytes:&_merkleRoot length:sizeof(_merkleRoot)];
+        [d appendUInt32:_timestamp];
+        [d appendUInt32:_target];
+        [d appendUInt32:_nonce];
+    }
     _blockHash = d.SHA256_2;
 
     return self;
@@ -125,6 +156,10 @@ inline static int ceil_log2(int x)
 merkleRoot:(UInt256)merkleRoot timestamp:(uint32_t)timestamp target:(uint32_t)target nonce:(uint32_t)nonce
 totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSData *)flags height:(uint32_t)height
 {
+    int32_t j;
+    for (j=31; j>=0; j--)
+        printf("%02x",blockHash.u8[j]);
+    NSLog(@" initWithBlockHash");
     if (! (self = [self init])) return nil;
     
     _blockHash = blockHash;
@@ -138,7 +173,6 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     _hashes = hashes;
     _flags = flags;
     _height = height;
-    
     return self;
 }
 
@@ -149,7 +183,11 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 {
     // target is in "compact" format, where the most significant byte is the size of resulting value in bytes, the next
     // bit is the sign, and the remaining 23bits is the value after having been right shifted by (size - 3)*8 bits
-    static const uint32_t maxsize = MAX_PROOF_OF_WORK >> 24, maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
+    static uint32_t maxsize,maxtarget;
+    if ( maxsize == 0 )
+        maxsize = MAX_PROOF_OF_WORK >> 24;
+    if ( maxtarget == 0 )
+        maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
     const uint32_t size = _target >> 24, target = _target & 0x00ffffffu;
     NSMutableData *d = [NSMutableData data];
     UInt256 merkleRoot, t = UINT256_ZERO;
@@ -170,21 +208,46 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         }];
     
     [root getValue:&merkleRoot];
-    if (_totalTransactions > 0 && ! uint256_eq(merkleRoot, _merkleRoot)) return NO; // merkle root check failed
-    
+    if (_totalTransactions > 0 && ! uint256_eq(merkleRoot, _merkleRoot))
+    {
+        NSLog(@"merkle root check failed");
+        return NO; // merkle root check failed
+    }
     // check if timestamp is too far in future
     //TODO: use estimated network time instead of system time (avoids timejacking attacks and misconfigured time)
-    if (_timestamp > [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 + MAX_TIME_DRIFT) return NO;
-    
+    if (_timestamp > [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 + MAX_TIME_DRIFT)
+    {
+        NSLog(@"timestamp check failed");
+        return NO;
+    }
     // check if proof-of-work target is out of range
-    if (target == 0 || target & 0x00800000u || size > maxsize || (size == maxsize && target > maxtarget)) return NO;
-
+    if (target == 0 || target & 0x00800000u || size > maxsize || (size == maxsize && target > maxtarget))
+    {
+        if ( COIN_IS_ZCASH == 0 )
+        {
+            NSLog(@"target check failed");
+            return NO;
+        }
+    }
     if (size > 3) *(uint32_t *)&t.u8[size - 3] = CFSwapInt32HostToLittle(target);
     else t.u32[0] = CFSwapInt32HostToLittle(target >> (3 - size)*8);
     
     for (int i = sizeof(t)/sizeof(uint32_t) - 1; i >= 0; i--) { // check proof-of-work
         if (CFSwapInt32LittleToHost(_blockHash.u32[i]) < CFSwapInt32LittleToHost(t.u32[i])) break;
-        if (CFSwapInt32LittleToHost(_blockHash.u32[i]) > CFSwapInt32LittleToHost(t.u32[i])) return NO;
+        if (CFSwapInt32LittleToHost(_blockHash.u32[i]) > CFSwapInt32LittleToHost(t.u32[i]))
+        {
+            int32_t j;
+            for (j=31; j>=0; j--)
+                printf("%02x",t.u8[j]);
+            printf(" t\n");
+            for (j=31; j>=0; j--)
+                printf("%02x",_blockHash.u8[j]);
+            printf(" _blockHash\n");
+            NSLog(@"  hashcmp check failed i.%d",i);
+            if ( COIN_IS_ZCASH != 0 )
+                break;
+            return NO;
+        }
     }
     
     return YES;
@@ -194,6 +257,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 {
     NSMutableData *d = [NSMutableData data];
     
+    NSLog(@"toData");
     [d appendUInt32:_version];
     [d appendBytes:&_prevBlock length:sizeof(_prevBlock)];
     [d appendBytes:&_merkleRoot length:sizeof(_merkleRoot)];
@@ -250,7 +314,8 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 {
     if (! uint256_eq(_prevBlock, previous.blockHash) || _height != previous.height + 1) return NO;
     if ((_height % BLOCK_DIFFICULTY_INTERVAL) == 0 && time == 0) return NO;
-
+    if ( COIN_IS_ZCASH != 0 )
+        return YES;
 #if BITCOIN_TESTNET
     //TODO: implement testnet difficulty rule check
     return YES; // don't worry about difficulty on testnet for now
@@ -260,7 +325,11 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 
     // target is in "compact" format, where the most significant byte is the size of resulting value in bytes, the next
     // bit is the sign, and the remaining 23bits is the value after having been right shifted by (size - 3)*8 bits
-    static const uint32_t maxsize = MAX_PROOF_OF_WORK >> 24, maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
+    static uint32_t maxsize,maxtarget;
+    if ( maxsize == 0 )
+        maxsize = MAX_PROOF_OF_WORK >> 24;
+    if ( maxtarget == 0 )
+        maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
     int32_t timespan = (int32_t)((int64_t)previous.timestamp - (int64_t)time), size = previous.target >> 24;
     uint64_t target = previous.target & 0x00ffffffu;
 
