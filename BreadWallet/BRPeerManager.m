@@ -103,7 +103,7 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
     { 443520, "00000000000000000345d0c7890b2c81ab5139c6e83400e5bed00d23a1f8d239", 1481765313, 0x18038b85 }*/
 };
 
-static const char *dns_seeds[] = { "seeds.komodoplatform.com.", "seeds.komodo.mewhub.com."
+static const char *dns_seeds[] = { "seeds.komodoplatform.com.", "seeds.komodo.mewhub.com"
     /*"seed.breadwallet.com.", "seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.", "dnsseed.bitcoin.dashjr.org.",
     "seed.bitcoinstats.com.", "bitseed.xf2.org.", "seed.bitcoin.jonasschnelli.ch."*/
 };
@@ -224,7 +224,7 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com.", "seeds.komodo.me
 
         if (_peers.count < PEER_MAX_CONNECTIONS ||
             ((BRPeer *)_peers[PEER_MAX_CONNECTIONS - 1]).timestamp + 3*24*60*60 < now) {
-            while (peers.count < sizeof(dns_seeds)/sizeof(*dns_seeds)) [peers addObject:[NSMutableArray array]];
+            while (peers.count <= sizeof(dns_seeds)/sizeof(*dns_seeds)) [peers addObject:[NSMutableArray array]];
         }
         
         if (peers.count > 0) {
@@ -267,16 +267,16 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com.", "seeds.komodo.me
 #endif
             // if DNS peer discovery fails, fall back on a hard coded list of peers (list taken from satoshi client)
             if (_peers.count < PEER_MAX_CONNECTIONS) {
-                UInt128 addr = { .u32 = { 0, 0, CFSwapInt32HostToBig(0xffff), 0 } };
-            
-                for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
+                UInt128 addr = { .u32 = { 0, 0, CFSwapInt32HostToBig(0xffff), 0xd2660905 } };
+                [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:BITCOIN_STANDARD_PORT timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60)) services:SERVICES_NODE_NETWORK]];
+                /*for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
                                            pathForResource:FIXED_PEERS ofType:@"plist"]]) {
                     // give hard coded peers a timestamp between 7 and 14 days ago
                     addr.u32[3] = CFSwapInt32HostToBig(address.unsignedIntValue);
                     [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:BITCOIN_STANDARD_PORT
                      timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
                      services:SERVICES_NODE_NETWORK | SERVICES_NODE_BLOOM]];
-                }
+                }*/
             }
             
             [self sortPeers];
@@ -999,17 +999,18 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com.", "seeds.komodo.me
     
     if (peer.timestamp > now + 2*60*60 || peer.timestamp < now - 2*60*60) peer.timestamp = now; //timestamp sanity check
     self.connectFailures = 0;
-    NSLog(@"%@:%d connected with lastblock %d", peer.host, peer.port, peer.lastblock);
+    NSLog(@"%@:%d connected with lastblock %d vs %d, services.%lld", peer.host, peer.port, peer.lastblock,self.lastBlockHeight,(long long)peer.services);
     
     // drop peers that don't carry full blocks, or aren't synced yet
     // TODO: XXXX does this work with 0.11 pruned nodes?
-    if (! (peer.services & SERVICES_NODE_NETWORK) || peer.lastblock + 10 < self.lastBlockHeight) {
+    if (! (peer.services & SERVICES_NODE_NETWORK) )//|| peer.lastblock + 10 < self.lastBlockHeight)
+    {
         [peer disconnect];
         return;
     }
 
     // drop peers that don't support SPV filtering
-    if (peer.version >= 70011 && ! (peer.services & SERVICES_NODE_BLOOM)) {
+    if ((peer.version % 100000) >= 70011 && ! (peer.services & SERVICES_NODE_BLOOM)) {
         [peer disconnect];
         return;
     }
@@ -1079,7 +1080,7 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com.", "seeds.komodo.me
 
 - (void)peer:(BRPeer *)peer disconnectedWithError:(NSError *)error
 {
-    NSLog(@"%@:%d disconnected%@%@", peer.host, peer.port, (error ? @", " : @""), (error ? error : @""));
+    NSLog(@"%@:%d disconnected%@%@ with error", peer.host, peer.port, (error ? @", " : @""), (error ? error : @""));
     
     if ([error.domain isEqual:@"BreadWallet"] && error.code != BITCOIN_TIMEOUT_CODE) {
         [self peerMisbehavin:peer]; // if it's protocol error other than timeout, the peer isn't following the rules
