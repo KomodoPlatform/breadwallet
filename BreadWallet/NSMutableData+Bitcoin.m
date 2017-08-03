@@ -206,7 +206,11 @@ CFAllocatorRef SecureAllocator()
 
 - (void)appendScriptPubKeyForAddress:(NSString *)address
 {
-    static uint8_t pubkeyAddress = BITCOIN_PUBKEY_ADDRESS, scriptAddress = BITCOIN_SCRIPT_ADDRESS;
+    static uint8_t pubkeyAddress, scriptAddress;
+    if ( pubkeyAddress == 0 )
+        pubkeyAddress = BITCOIN_PUBKEY_ADDRESS;
+    if ( scriptAddress == 0 )
+        scriptAddress = BITCOIN_SCRIPT_ADDRESS;
     NSData *d = address.base58checkToData;
 
     if (d.length != 21) return;
