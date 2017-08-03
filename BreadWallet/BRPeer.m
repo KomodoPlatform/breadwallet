@@ -763,7 +763,7 @@ services:(uint64_t)services
         [self sendPingMessageWithPongHandler:self.mempoolCompletion];
         self.mempoolCompletion = nil;
     }
-    NSLog(@"finished inv");
+    //NSLog(@"finished inv");
 }
 
 - (void)acceptTxMessage:(NSData *)message

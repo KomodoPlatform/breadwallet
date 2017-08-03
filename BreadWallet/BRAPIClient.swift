@@ -162,7 +162,7 @@ func buildRequestSigningString(_ r: URLRequest) -> String {
     #else
     var host = "api.breadwallet.com"
     #endif*/
-    var host = "api.google.com"
+    var host = "api.supernet.org"
     // isFetchingAuth is set to true when a request is currently trying to renew authentication (the token)
     // it is useful because fetching auth is not idempotent and not reentrant, so at most one auth attempt
     // can take place at any one time
