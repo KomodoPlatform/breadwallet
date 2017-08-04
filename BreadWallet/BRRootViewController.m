@@ -426,8 +426,9 @@
 
     if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 5) {
         manager.format.currencySymbol = @"m" BTC NARROW_NBSP;
-        manager.format.maximumFractionDigits = 5;
-        manager.format.maximum = @((MAX_MONEY/SATOSHIS)*1000);
+        manager.format.maximumFractionDigits = 8;
+        manager.format.maximum = @(MAX_MONEY/SATOSHIS);
+        //manager.format.maximum = @((MAX_MONEY/SATOSHIS)*1000);
     }
     else if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 8) {
         manager.format.currencySymbol = BTC NARROW_NBSP;
