@@ -305,7 +305,7 @@ services:(uint64_t)services
     if (! self.runLoop) return;
 
     CFRunLoopPerformBlock([self.runLoop getCFRunLoop], kCFRunLoopCommonModes, ^{
-        NSLog(@"%@:%u sending %@", self.host, self.port, type);
+        //NSLog(@"%@:%u sending %@", self.host, self.port, type);
 
         [self.outputBuffer appendMessage:message type:type];
         
@@ -682,7 +682,7 @@ services:(uint64_t)services
         return;
     }
     
-    NSLog(@"%@:%u got inv with %u items", self.host, self.port, (int)count);
+    //NSLog(@"%@:%u got inv with %u items", self.host, self.port, (int)count);
     
     for (NSUInteger off = l; off < l + 36*count; off += 36) {
         inv_type type = [message UInt32AtOffset:off];
