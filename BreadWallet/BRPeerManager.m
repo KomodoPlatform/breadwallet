@@ -1442,11 +1442,13 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com", "seeds.komodo.mew
 
         NSLog(@"chain fork to height %d vs last.%d", block.height,self.lastBlockHeight);
         self.blocks[blockHash] = block;
-        if (block.height <= self.lastBlockHeight)
+        if (block.height <= self.lastBlockHeight) // <=
         {
-            if ( block.height == 1 )
+            static uint32_t counter;
+            if ( block.height == 1 && counter++ > 2 )
             {
-                printf("reset self.lastBlockHeight\n");
+                self.lastBlock = block;
+                printf(">>>>>>>>>>>>>>>>> reset lastblock\n");
             }
             return; // if fork is shorter than main chain, ignore it for now
         }
