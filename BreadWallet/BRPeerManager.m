@@ -1440,13 +1440,15 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com", "seeds.komodo.mew
             return;
         }
 
-        NSLog(@"chain fork to height %d vs last.%d", block.height,self.lastBlockHeight);
+        static uint32_t counter;
+        NSLog(@"chain fork to height %d vs last.%d  counter.%d vs %d", block.height,self.lastBlockHeight,counter,PEER_MAX_CONNECTIONS);
         self.blocks[blockHash] = block;
-        if (block.height <= self.lastBlockHeight)
+        if (block.height <= self.lastBlockHeight) // <=
         {
-            if ( block.height == 1 )
+            if ( block.height == 1 && counter++ > PEER_MAX_CONNECTIONS )
             {
-                printf("reset self.lastBlockHeight\n");
+                self.lastBlock = block;
+                printf(">>>>>>>>>>>>>>>>> reset lastblock\n");
             }
             return; // if fork is shorter than main chain, ignore it for now
         }
