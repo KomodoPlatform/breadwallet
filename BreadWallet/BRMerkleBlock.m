@@ -223,7 +223,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     // check if proof-of-work target is out of range
     if (target == 0 || target & 0x00800000u || size > maxsize || (size == maxsize && target > maxtarget))
     {
-        if ( COIN_IS_ZCASH == 0 )
+        if ( COIN_IS_KMD == 0 )
         {
             NSLog(@"target check failed");
             return NO;
@@ -236,7 +236,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         if (CFSwapInt32LittleToHost(_blockHash.u32[i]) < CFSwapInt32LittleToHost(t.u32[i])) break;
         if (CFSwapInt32LittleToHost(_blockHash.u32[i]) > CFSwapInt32LittleToHost(t.u32[i]))
         {
-            if ( COIN_IS_ZCASH != 0 )
+            if ( COIN_IS_KMD != 0 )
                 break;
             int32_t j;
             for (j=31; j>=0; j--)
@@ -314,7 +314,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 {
     if (! uint256_eq(_prevBlock, previous.blockHash) || _height != previous.height + 1) return NO;
     if ((_height % BLOCK_DIFFICULTY_INTERVAL) == 0 && time == 0) return NO;
-    if ( COIN_IS_ZCASH != 0 )
+    if ( COIN_IS_KMD != 0 )
         return YES;
 #if BITCOIN_TESTNET
     //TODO: implement testnet difficulty rule check

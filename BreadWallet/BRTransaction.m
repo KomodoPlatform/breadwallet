@@ -61,7 +61,9 @@
     self.outScripts = [NSMutableArray array];
     self.signatures = [NSMutableArray array];
     self.sequences = [NSMutableArray array];
-    _lockTime = TX_LOCKTIME;
+    if ( COIN_IS_KMD != 0 )
+        _lockTime = ([NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 - 777);
+    else _lockTime = TX_LOCKTIME;
     _blockHeight = TX_UNCONFIRMED;
     return self;
 }
@@ -153,7 +155,9 @@ outputAddresses:(NSArray *)addresses outputAmounts:(NSArray *)amounts
         [self.sequences addObject:@(TXIN_SEQUENCE)];
     }
 
-    _lockTime = TX_LOCKTIME;
+    if ( COIN_IS_KMD != 0 )
+        _lockTime = ([NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 - 777);
+    else _lockTime = TX_LOCKTIME;
     _blockHeight = TX_UNCONFIRMED;
     return self;
 }
