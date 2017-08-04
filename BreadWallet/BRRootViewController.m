@@ -504,7 +504,7 @@
                     [[NSUserDefaults standardUserDefaults] boolForKey:@"has_alerted_buy_bitcoin"] == NO
                     && [WKWebView class] && [[BRAPIClient sharedClient] featureEnabled:BRFeatureFlagsBuyBitcoin]) {
                     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"has_alerted_buy_bitcoin"];
-                    [self showBuyAlert];
+                    //[self showBuyAlert];
                 }
             }];
         }

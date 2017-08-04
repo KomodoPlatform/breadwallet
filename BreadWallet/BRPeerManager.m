@@ -103,7 +103,7 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
     { 443520, "00000000000000000345d0c7890b2c81ab5139c6e83400e5bed00d23a1f8d239", 1481765313, 0x18038b85 }*/
 };
 
-static const char *dns_seeds[] = { "seeds.komodoplatform.com.", "seeds.komodo.mewhub.com"
+static const char *dns_seeds[] = { "seeds.komodoplatform.com", "seeds.komodo.mewhub.com"
     /*"seed.breadwallet.com.", "seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.", "dnsseed.bitcoin.dashjr.org.",
     "seed.bitcoinstats.com.", "bitseed.xf2.org.", "seed.bitcoin.jonasschnelli.ch."*/
 };

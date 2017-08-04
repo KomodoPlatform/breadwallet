@@ -25,6 +25,8 @@
 
 #import <Foundation/Foundation.h>
 
+// todo: collect interest, KMD compatible passphrase, RPC interface for subset
+
 /*#define BITCOIN_PUBKEY_ADDRESS      0
 #define BITCOIN_SCRIPT_ADDRESS      5
 #define BITCOIN_PRIVKEY             128*/
