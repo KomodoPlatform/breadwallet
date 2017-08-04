@@ -30,6 +30,7 @@
 #define MAX_TIME_DRIFT    (2*60*60)     // the furthest in the future a block is allowed to be timestamped
 //#define MAX_PROOF_OF_WORK 0x1d00ffffu   // highest value for difficulty target (higher values are less difficult)
 extern uint32_t MAX_PROOF_OF_WORK;
+extern int32_t COIN_IS_KMD;
 #define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments
 
 // from https://en.bitcoin.it/wiki/Protocol_specification#Merkle_Trees
@@ -223,7 +224,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     // check if proof-of-work target is out of range
     if (target == 0 || target & 0x00800000u || size > maxsize || (size == maxsize && target > maxtarget))
     {
-        if ( COIN_IS_ZCASH == 0 )
+        if ( COIN_IS_KMD == 0 )
         {
             NSLog(@"target check failed");
             return NO;
@@ -236,7 +237,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         if (CFSwapInt32LittleToHost(_blockHash.u32[i]) < CFSwapInt32LittleToHost(t.u32[i])) break;
         if (CFSwapInt32LittleToHost(_blockHash.u32[i]) > CFSwapInt32LittleToHost(t.u32[i]))
         {
-            if ( COIN_IS_ZCASH != 0 )
+            if ( COIN_IS_KMD != 0 )
                 break;
             int32_t j;
             for (j=31; j>=0; j--)
@@ -314,7 +315,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 {
     if (! uint256_eq(_prevBlock, previous.blockHash) || _height != previous.height + 1) return NO;
     if ((_height % BLOCK_DIFFICULTY_INTERVAL) == 0 && time == 0) return NO;
-    if ( COIN_IS_ZCASH != 0 )
+    if ( COIN_IS_KMD != 0 )
         return YES;
 #if BITCOIN_TESTNET
     //TODO: implement testnet difficulty rule check

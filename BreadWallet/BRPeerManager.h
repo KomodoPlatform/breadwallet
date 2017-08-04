@@ -32,7 +32,7 @@ FOUNDATION_EXPORT NSString* _Nonnull const BRPeerManagerSyncFinishedNotification
 FOUNDATION_EXPORT NSString* _Nonnull const BRPeerManagerSyncFailedNotification;
 FOUNDATION_EXPORT NSString* _Nonnull const BRPeerManagerTxStatusNotification;
 
-#define PEER_MAX_CONNECTIONS 64
+#define PEER_MAX_CONNECTIONS 8
 #define SETTINGS_FIXED_PEER_KEY @"SETTINGS_FIXED_PEER"
 
 @class BRTransaction;
