@@ -31,9 +31,13 @@ uint8_t BITCOIN_PUBKEY_ADDRESS = 60;
 uint8_t BITCOIN_SCRIPT_ADDRESS = 85;
 uint8_t BITCOIN_PRIVKEY = 188;
 uint16_t BITCOIN_STANDARD_PORT = 7770;
-uint32_t BITCOIN_MAGIC_NUMBER = 0xf9eee48d;
+uint32_t BITCOIN_MAGIC_NUMBER = 0x8de4eef9;//0xf9eee48d;
 #define SATOSHIS           100000000LL
 uint64_t MAX_MONEY = (200000000LL * SATOSHIS);
+int32_t PROTOCOL_VERSION = 170002;
+int32_t MIN_PROTO_VERSION = 170002;
+uint32_t MAX_PROOF_OF_WORK = 0x200f0f0f;
+int32_t COIN_IS_ZCASH = 1;
 
 static const UniChar base58chars[] = {
     '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P',

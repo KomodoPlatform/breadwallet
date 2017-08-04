@@ -743,6 +743,12 @@ size_t chacha20Poly1305AEADDecrypt(void *out, size_t outLen, const void *key32, 
     return *(const UInt256 *)((const char *)self.bytes + offset);
 }
 
+- (UInt8_1344)UInt8_1344AtOffset:(NSUInteger)offset
+{
+    if (self.length < offset + sizeof(UInt8_1344)) return UINT8_1344_ZERO;
+    return *(const UInt8_1344 *)((const char *)self.bytes + offset);
+}
+
 - (NSString *)stringAtOffset:(NSUInteger)offset length:(NSUInteger *)length
 {
     NSUInteger ll, l = (NSUInteger)[self varIntAtOffset:offset length:&ll];

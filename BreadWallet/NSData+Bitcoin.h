@@ -52,6 +52,14 @@ typedef union _UInt128 {
     uint64_t u64[128/64];
 } UInt128;
 
+#define ZCASH_SOLUTION_ELEMENTS 1344
+typedef union _UInt8_1344 {
+    uint8_t u8[1344];
+    uint16_t u16[1344/2];
+    uint32_t u32[1344/4];
+    uint64_t u64[1344/8];
+} UInt8_1344;
+
 #define uint512_eq(a, b)\
     ((a).u64[0] == (b).u64[0] && (a).u64[1] == (b).u64[1] && (a).u64[2] == (b).u64[2] && (a).u64[3] == (b).u64[3] &&\
      (a).u64[4] == (b).u64[4] && (a).u64[5] == (b).u64[5] && (a).u64[6] == (b).u64[6] && (a).u64[7] == (b).u64[7])
@@ -73,6 +81,19 @@ typedef union _UInt128 {
 #define uint160_obj(u) ([NSValue value:(u).u8 withObjCType:@encode(UInt160)])
 #define uint128_obj(u) ([NSValue value:(u).u8 withObjCType:@encode(UInt128)])
 
+#define UINT8_1344_ZERO ((UInt8_1344) { .u64 = {\
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+0, 0, 0, 0, 0, 0, 0, 0 \
+}})
 #define UINT512_ZERO ((UInt512) { .u64 = { 0, 0, 0, 0, 0, 0, 0, 0 } })
 #define UINT256_ZERO ((UInt256) { .u64 = { 0, 0, 0, 0 } })
 #define UINT160_ZERO ((UInt160) { .u32 = { 0, 0, 0, 0, 0 } })
@@ -145,6 +166,7 @@ size_t chacha20Poly1305AEADDecrypt(void *_Nullable out, size_t outLen, const voi
 - (uint64_t)UInt64AtOffset:(NSUInteger)offset;
 - (uint64_t)varIntAtOffset:(NSUInteger)offset length:(NSUInteger * _Nonnull)length;
 - (UInt256)hashAtOffset:(NSUInteger)offset;
+- (UInt8_1344)UInt8_1344AtOffset:(NSUInteger)offset;
 - (NSString *_Nullable)stringAtOffset:(NSUInteger)offset length:(NSUInteger *_Nonnull)length;
 - (NSData *_Nullable)dataAtOffset:(NSUInteger)offset length:(NSUInteger *_Nonnull)length;
 

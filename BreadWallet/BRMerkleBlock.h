@@ -27,8 +27,11 @@
 
 #define BLOCK_DIFFICULTY_INTERVAL 2016      // number of blocks between difficulty target adjustments
 #define BLOCK_UNKNOWN_HEIGHT      INT32_MAX
+extern int32_t COIN_IS_ZCASH;
 
 typedef union _UInt256 UInt256;
+
+typedef union _UInt8_1344 UInt8_1344;
 
 @interface BRMerkleBlock : NSObject
 
@@ -36,9 +39,14 @@ typedef union _UInt256 UInt256;
 @property (nonatomic, readonly) uint32_t version;
 @property (nonatomic, readonly) UInt256 prevBlock;
 @property (nonatomic, readonly) UInt256 merkleRoot;
+@property (nonatomic, readonly) UInt256 reserved;
 @property (nonatomic, readonly) uint32_t timestamp; // time interval since unix epoch
 @property (nonatomic, readonly) uint32_t target;
+@property (nonatomic, readonly) UInt256 bignonce;
 @property (nonatomic, readonly) uint32_t nonce;
+@property (nonatomic, readonly) NSUInteger numelements;
+@property (nonatomic, readonly) UInt8_1344 solution;
+
 @property (nonatomic, readonly) uint32_t totalTransactions;
 @property (nonatomic, readonly) NSData *hashes;
 @property (nonatomic, readonly) NSData *flags;
