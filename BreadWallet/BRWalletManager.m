@@ -241,7 +241,7 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
                                   withString:@"-#"];
     self.format.currencyCode = @"XBT";
     self.format.currencySymbol = BITS NARROW_NBSP;
-    self.format.maximumFractionDigits = 2;
+    self.format.maximumFractionDigits = 8;
     self.format.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
     self.format.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.format.maximumFractionDigits));
     _localFormat = [NSNumberFormatter new];
