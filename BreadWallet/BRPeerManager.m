@@ -547,7 +547,6 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com", "seeds.komodo.mew
 - (void)rescan
 {
     if (! self.connected) return;
-
     dispatch_async(self.q, ^{
         _lastBlock = nil;
 
@@ -1441,9 +1440,16 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com", "seeds.komodo.mew
             return;
         }
 
-        NSLog(@"chain fork to height %d", block.height);
+        NSLog(@"chain fork to height %d vs last.%d", block.height,self.lastBlockHeight);
         self.blocks[blockHash] = block;
-        if (block.height <= self.lastBlockHeight) return; // if fork is shorter than main chain, ignore it for now
+        if (block.height <= self.lastBlockHeight)
+        {
+            if ( block.height == 1 )
+            {
+                printf("reset self.lastBlockHeight\n");
+            }
+            return; // if fork is shorter than main chain, ignore it for now
+        }
 
         NSMutableArray *txHashes = [NSMutableArray array];
         BRMerkleBlock *b = block, *b2 = self.lastBlock;
