@@ -1448,6 +1448,7 @@ static const char *dns_seeds[] = { "seeds.komodoplatform.com", "seeds.komodo.mew
             if ( block.height == 1 && counter++ > PEER_MAX_CONNECTIONS )
             {
                 self.lastBlock = block;
+                counter = 0;
                 printf(">>>>>>>>>>>>>>>>> reset lastblock\n");
             }
             return; // if fork is shorter than main chain, ignore it for now

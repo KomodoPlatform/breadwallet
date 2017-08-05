@@ -418,7 +418,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
     }
     else amount = self.amount;
 
-    if ([manager.wallet containsAddress:address]) {
+    /*if ( [manager.wallet containsAddress:address]) {
         [[[UIAlertView alloc] initWithTitle:@""
           message:NSLocalizedString(@"this payment address is already in your wallet", nil)
           delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
@@ -437,7 +437,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
           otherButtonTitles:NSLocalizedString(@"ignore", nil), NSLocalizedString(@"cancel", nil), nil] show];
           return;
     }
-    else if (protoReq.errorMessage.length > 0 && protoReq.commonName.length > 0 &&
+    else*/ if (protoReq.errorMessage.length > 0 && protoReq.commonName.length > 0 &&
              ! [self.okIdentity isEqual:protoReq.commonName]) {
         self.request = protoReq;
         self.okIdentity = protoReq.commonName;

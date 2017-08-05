@@ -36,6 +36,8 @@
 #import "NSMutableData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
 
+extern int32_t COIN_IS_KMD;
+
 // chain position of first tx output address that appears in chain
 static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
     for (NSString *addr in tx.outputAddresses) {
@@ -457,10 +459,37 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     return [self transactionForAmounts:@[@(amount)] toOutputScripts:@[script] withFee:fee];
 }
 
+uint64_t kmd_interest(uint32_t now,uint32_t txlocktime,uint64_t value)
+{
+    int32_t minutes; uint64_t numerator=0,denominator=0,interest=0;
+    if ( (minutes= (now - 777 - txlocktime) / 60) >= 60 )
+    {
+        if ( minutes > 365 * 24 * 60 )
+            minutes = 365 * 24 * 60;
+        minutes -= 59;
+        denominator = (((uint64_t)365 * 24 * 60) / minutes);
+        if ( denominator == 0 )
+            denominator = 1; // max KOMODO_INTEREST per transfer, do it at least annually!
+        if ( value > 25000LL*SATOSHIS )
+        {
+            numerator = (value / 20); // assumes 5%!
+            interest = (numerator * minutes) / ((uint64_t)365 * 24 * 60);
+            printf("minutes.%d interest %llu on value %llu\n",minutes,(long long)interest,(long long)value);
+        }
+        else if ( value >= 10*SATOSHIS )
+        {
+            numerator = (value / 20); // assumes 5%!
+            interest = ((numerator * minutes) / ((uint64_t)365 * 24 * 60));
+            printf("minutes.%d interest %llu on value %llu\n",minutes,(long long)interest,(long long)value);
+        }
+    }
+    return(interest);
+}
+
 // returns an unsigned transaction that sends the specified amounts from the wallet to the specified output scripts
 - (BRTransaction *)transactionForAmounts:(NSArray *)amounts toOutputScripts:(NSArray *)scripts withFee:(BOOL)fee
 {
-    uint64_t amount = 0, balance = 0, feeAmount = 0;
+    uint64_t value,amount = 0, balance = 0, feeAmount = 0, interest = 0; uint32_t now = 0;
     BRTransaction *transaction = [BRTransaction new], *tx;
     NSUInteger i = 0, cpfpSize = 0;
     BRUTXO o;
@@ -488,8 +517,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         
             // check for sufficient total funds before building a smaller transaction
             if (self.balance < amount + [self feeForTxSize:txSize + cpfpSize]) {
-                NSLog(@"Insufficient funds. %llu is less than transaction amount:%llu", self.balance,
-                      amount + [self feeForTxSize:txSize + cpfpSize]);
+                NSLog(@"Insufficient funds. %llu is less than transaction amount:%llu", self.balance,amount + [self feeForTxSize:txSize + cpfpSize]);
                 return nil;
             }
         
@@ -504,9 +532,14 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
             
             return [self transactionForAmounts:newAmounts toOutputScripts:newScripts withFee:fee];
         }
-        
-        balance += [tx.outputAmounts[o.n] unsignedLongLongValue];
-        
+        value = [tx.outputAmounts[o.n] unsignedLongLongValue];
+        balance += value;
+        if ( COIN_IS_KMD != 0 && tx.lockTime > TX_MAX_LOCK_HEIGHT )
+        {
+            if ( now == 0 )
+                now = [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970;
+            interest += kmd_interest(now,tx.lockTime,value);
+        }
 //        // add up size of unconfirmed, non-change inputs for child-pays-for-parent fee calculation
 //        // don't include parent tx with more than 10 inputs or 10 outputs
 //        if (tx.blockHeight == TX_UNCONFIRMED && tx.inputHashes.count <= 10 && tx.outputAmounts.count <= 10 &&
@@ -517,16 +550,17 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
             if (self.balance > amount) feeAmount += (self.balance - amount) % 100; // round off balance to 100 satoshi
         }
         
-        if (balance == amount + feeAmount || balance >= amount + feeAmount + self.minOutputAmount) break;
+        if ((balance+interest) == amount + feeAmount || (balance+interest) >= amount + feeAmount + self.minOutputAmount) break;
     }
-    
-    if (balance < amount + feeAmount) { // insufficient funds
-        NSLog(@"Insufficient funds. %llu is less than transaction amount:%llu", balance, amount + feeAmount);
+    if ( interest != 0 )
+        printf("interest %llu when balance %llu\n",(long long)interest,(long long)balance);
+    if ((balance+interest) < amount + feeAmount) { // insufficient funds
+        NSLog(@"Insufficient funds. %llu is less than transaction amount:%llu interest:%llu", balance, amount + feeAmount,interest);
         return nil;
     }
     
-    if (balance - (amount + feeAmount) >= self.minOutputAmount) {
-        [transaction addOutputAddress:self.changeAddress amount:balance - (amount + feeAmount)];
+    if ((balance+interest) - (amount + feeAmount) >= self.minOutputAmount) {
+        [transaction addOutputAddress:self.changeAddress amount:(balance+interest) - (amount + feeAmount)];
         [transaction shuffleOutputOrder];
     }
     
