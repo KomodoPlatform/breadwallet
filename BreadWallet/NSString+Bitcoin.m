@@ -26,13 +26,13 @@
 #import "NSString+Bitcoin.h"
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
+#define SATOSHIS           100000000LL
 
 uint8_t BITCOIN_PUBKEY_ADDRESS = 60;
 uint8_t BITCOIN_SCRIPT_ADDRESS = 85;
 uint8_t BITCOIN_PRIVKEY = 188;
 uint16_t BITCOIN_STANDARD_PORT = 7770;
-uint32_t BITCOIN_MAGIC_NUMBER = 0x8de4eef9;//0xf9eee48d;
-#define SATOSHIS           100000000LL
+uint32_t BITCOIN_MAGIC_NUMBER = 0x8de4eef9; //0xf9eee48d;
 uint64_t MAX_MONEY = (200000000LL * SATOSHIS);
 int32_t PROTOCOL_VERSION = 170002;
 int32_t MIN_PROTO_VERSION = 170002;
