@@ -140,6 +140,7 @@ typedef struct _BRUTXO {
 
 // true if tx is considered 0-conf safe (valid and not pending, timestamp is greater than 0, and no unverified inputs)
 - (BOOL)transactionIsVerified:(BRTransaction * _Nonnull)transaction;
+- (uint64_t)accrued_interest;
 
 // sets the block heights and timestamps for the given transactions, and returns an array of hashes of the updated tx
 // use a height of TX_UNCONFIRMED and timestamp of 0 to indicate a transaction and it's dependents should remain marked

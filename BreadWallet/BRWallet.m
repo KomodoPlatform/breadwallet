@@ -486,6 +486,26 @@ uint64_t kmd_interest(uint32_t now,uint32_t txlocktime,uint64_t value)
     return(interest);
 }
 
+-(uint64_t)accrued_interest
+{
+    uint64_t interest,total=0; BRTransaction *tx; BRUTXO o; uint32_t now = 0;
+    for (NSValue *output in self.utxos)
+    {
+        [output getValue:&o];
+        tx = self.allTx[uint256_obj(o.hash)];
+        if ( !tx)
+            continue;
+        if ( COIN_IS_KMD != 0 && tx.lockTime > TX_MAX_LOCK_HEIGHT )
+        {
+            if ( now == 0 )
+                now = [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970;
+            interest = kmd_interest(now,tx.lockTime,[tx.outputAmounts[o.n] unsignedLongLongValue]);
+            total += interest;
+        }
+    }
+    return(total);
+}
+
 // returns an unsigned transaction that sends the specified amounts from the wallet to the specified output scripts
 - (BRTransaction *)transactionForAmounts:(NSArray *)amounts toOutputScripts:(NSArray *)scripts withFee:(BOOL)fee
 {

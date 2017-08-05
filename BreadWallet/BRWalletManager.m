@@ -223,8 +223,11 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
     return singleton;
 }
 
+void KMD_setconstants();
+
 - (instancetype)init
 {
+    KMD_setconstants();
     if (! (self = [super init])) return nil;
 
     [NSManagedObject setConcurrencyType:NSPrivateQueueConcurrencyType];
@@ -320,7 +323,7 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
             if (_wallet.allReceiveAddresses.count > 0 && k && ! [_wallet containsAddress:k.address]) {
                 NSLog(@"wallet doesn't contain address: %@", k.address);
 #if DEBUG
-                abort(); // don't wipe core data for debug builds
+                //abort(); // don't wipe core data for debug builds
 #else
                 [[NSManagedObject context] performBlockAndWait:^{
                     [BRAddressEntity deleteObjects:[BRAddressEntity allObjects]];
