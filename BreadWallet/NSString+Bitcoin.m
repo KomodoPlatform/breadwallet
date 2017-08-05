@@ -23,22 +23,58 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
+// change the following BITCOIN_SYMBOL to automatically set all the coin specific values
+char BITCOIN_SYMBOL[16] = { "KMD" };
+
+
 #import "NSString+Bitcoin.h"
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 #define SATOSHIS           100000000LL
 
-uint8_t BITCOIN_PUBKEY_ADDRESS = 60;
-uint8_t BITCOIN_SCRIPT_ADDRESS = 85;
-uint8_t BITCOIN_PRIVKEY = 188;
-uint16_t BITCOIN_STANDARD_PORT = 7770;
-uint32_t BITCOIN_MAGIC_NUMBER = 0x8de4eef9; //0xf9eee48d;
-uint64_t MAX_MONEY = (200000000LL * SATOSHIS);
-int32_t PROTOCOL_VERSION = 170002;
-int32_t MIN_PROTO_VERSION = 170002;
-uint32_t MAX_PROOF_OF_WORK = 0x200f0f0f;
-int32_t COIN_IS_ZCASH = 1;
-int32_t COIN_IS_KMD = 1;
+uint8_t BITCOIN_PUBKEY_ADDRESS;
+uint8_t BITCOIN_SCRIPT_ADDRESS;
+uint8_t BITCOIN_PRIVKEY;
+uint16_t BITCOIN_STANDARD_PORT;
+uint32_t BITCOIN_MAGIC_NUMBER;
+uint64_t MAX_MONEY;
+int32_t PROTOCOL_VERSION;
+int32_t MIN_PROTO_VERSION;
+uint32_t MAX_PROOF_OF_WORK;
+int32_t COIN_IS_ZCASH;
+int32_t COIN_IS_KMD;
+
+void KMD_setconstants()
+{
+    if ( BITCOIN_STANDARD_PORT != 0 )
+        return;
+    if ( strcmp(BITCOIN_SYMBOL,"BTC") == 0 )
+    {
+        BITCOIN_PUBKEY_ADDRESS = 0;
+        BITCOIN_SCRIPT_ADDRESS = 5;
+        BITCOIN_PRIVKEY = 128;
+        BITCOIN_STANDARD_PORT = 8333;
+        BITCOIN_MAGIC_NUMBER = 0xd9b4bef9;
+        MAX_MONEY = (21000000LL * SATOSHIS);
+        PROTOCOL_VERSION = 70013;
+        MIN_PROTO_VERSION = 70002;
+        MAX_PROOF_OF_WORK = 0x1d00ffff;
+    }
+    else // default to KMD
+    {
+        BITCOIN_PUBKEY_ADDRESS = 60;
+        BITCOIN_SCRIPT_ADDRESS = 85;
+        BITCOIN_PRIVKEY = 188;
+        BITCOIN_STANDARD_PORT = 7770;
+        BITCOIN_MAGIC_NUMBER = 0x8de4eef9; //0xf9eee48d;
+        MAX_MONEY = (200000000LL * SATOSHIS);
+        PROTOCOL_VERSION = 170002;
+        MIN_PROTO_VERSION = 170002;
+        MAX_PROOF_OF_WORK = 0x200f0f0f;
+        COIN_IS_ZCASH = 1;
+        COIN_IS_KMD = 1;
+    }
+}
 
 static const UniChar base58chars[] = {
     '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P',
@@ -50,6 +86,7 @@ static const UniChar base58chars[] = {
 
 + (NSString *)base58WithData:(NSData *)d
 {
+    KMD_setconstants();
     if (! d) return nil;
     
     size_t i, z = 0;
@@ -85,6 +122,7 @@ static const UniChar base58chars[] = {
 
 + (NSString *)base58checkWithData:(NSData *)d
 {
+    KMD_setconstants();
     if (! d) return nil;
     
     NSMutableData *data = [NSMutableData secureDataWithData:d];
@@ -95,6 +133,7 @@ static const UniChar base58chars[] = {
 
 + (NSString *)hexWithData:(NSData *)d
 {
+    KMD_setconstants();
     if (! d) return nil;
     
     const uint8_t *bytes = d.bytes;
@@ -113,6 +152,7 @@ static const UniChar base58chars[] = {
 // current coin selection code
 + (NSString *)addressWithScriptPubKey:(NSData *)script
 {
+    KMD_setconstants();
     if (script == (id)[NSNull null]) return nil;
 
     NSArray *elem = [script scriptElements];
@@ -151,6 +191,7 @@ static const UniChar base58chars[] = {
 
 + (NSString *)addressWithScriptSig:(NSData *)script
 {
+    KMD_setconstants();
     if (script == (id)[NSNull null]) return nil;
 
     NSArray *elem = [script scriptElements];
@@ -188,7 +229,8 @@ static const UniChar base58chars[] = {
 - (NSData *)base58ToData
 {
     size_t i, z = 0;
-    
+    KMD_setconstants();
+   
     while (z < self.length && [self characterAtIndex:z] == base58chars[0]) z++; // count leading zeroes
     
     uint8_t buf[(self.length - z)*733/1000 + 1]; // log(58)/log(256), rounded up
@@ -255,7 +297,8 @@ static const UniChar base58chars[] = {
 - (NSData *)base58checkToData
 {
     NSData *d = self.base58ToData;
-    
+    KMD_setconstants();
+   
     if (d.length < 4) return nil;
 
     NSData *data = CFBridgingRelease(CFDataCreate(SecureAllocator(), d.bytes, d.length - 4));
@@ -267,6 +310,7 @@ static const UniChar base58chars[] = {
 
 - (NSData *)hexToData
 {
+    KMD_setconstants();
     if (self.length % 2) return nil;
     
     NSMutableData *d = [NSMutableData secureDataWithCapacity:self.length/2];
@@ -307,6 +351,7 @@ static const UniChar base58chars[] = {
 - (NSData *)addressToHash160
 {
     NSData *d = self.base58checkToData;
+    KMD_setconstants();
 
     return (d.length == 160/8 + 1) ? [d subdataWithRange:NSMakeRange(1, d.length - 1)] : nil;
 }
@@ -314,7 +359,8 @@ static const UniChar base58chars[] = {
 - (BOOL)isValidBitcoinAddress
 {
     NSData *d = self.base58checkToData;
-    
+    KMD_setconstants();
+   
     if (d.length != 21) return NO;
     
     uint8_t version = *(const uint8_t *)d.bytes;
@@ -329,7 +375,8 @@ static const UniChar base58chars[] = {
 - (BOOL)isValidBitcoinPrivateKey
 {
     NSData *d = self.base58checkToData;
-    
+    KMD_setconstants();
+
     if (d.length == 33 || d.length == 34) { // wallet import format: https://en.bitcoin.it/wiki/Wallet_import_format
 #if BITCOIN_TESTNET
         return (*(const uint8_t *)d.bytes == BITCOIN_PRIVKEY_TEST) ? YES : NO;
@@ -353,6 +400,7 @@ static const UniChar base58chars[] = {
 - (BOOL)isValidBitcoinBIP38Key
 {
     NSData *d = self.base58checkToData;
+    KMD_setconstants();
 
     if (d.length != 39) return NO; // invalid length
 
