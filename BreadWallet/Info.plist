@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>bread</string>
+	<string>KomodoWallet</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -69,7 +69,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>org.voisine.bread</string>
+			<string>com.satindergrewal.agamawalletkmd</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>bread</string>
