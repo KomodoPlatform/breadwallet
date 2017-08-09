@@ -41,7 +41,7 @@ Simplicity is **breadwallet**'s core design principle. A simple backup phrase is
 **breadwallet** supports the [x-callback-url](http://x-callback-url.com) specification with the following URLs:
 
 ```
-bread://x-callback-url/address?x-success=myscheme://myaction
+komodowallet://x-callback-url/address?x-success=myscheme://myaction
 ```
 
 This will callback with the current wallet receive address: `myscheme://myaction?address=1XXXX`
@@ -49,7 +49,7 @@ This will callback with the current wallet receive address: `myscheme://myaction
 The following will ask the user to authorize copying a list of their wallet addresses to the clipboard before calling back:
 
 ```
-bread://x-callback-url/addresslist?x-success=myscheme://myaction
+komodowallet://x-callback-url/addresslist?x-success=myscheme://myaction
 ```
 
 ### WARNING:
