@@ -40,6 +40,8 @@
 #pragma message "snapshot build"
 #endif
 
+void KMD_setconstants();
+
 @interface BRAppDelegate () <PKPushRegistryDelegate>
 
 // the nsnotificationcenter observer for wallet balance
@@ -94,7 +96,7 @@
     //      https://github.com/cetuscetus/btctool/blob/bip/bip-xxxx.mediawiki
 
     [BRPhoneWCSessionManager sharedInstance];
-    
+    KMD_setconstants();
     // observe balance and create notifications
     [self setupBalanceNotification:application];
     [self setupPreferenceDefaults];
