@@ -24,8 +24,8 @@
                             <imageView userInteractionEnabled="NO" contentMode="bottomLeft" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="wallpaper-welcome" translatesAutoresizingMaskIntoConstraints="NO" id="FwI-2H-GnU">
                                 <rect key="frame" x="0.0" y="-69" width="964" height="736"/>
                             </imageView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="agama-big" translatesAutoresizingMaskIntoConstraints="NO" id="Ph3-0i-aKu">
-                                <rect key="frame" x="59" y="205" width="257" height="257"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="komodowallet-big" translatesAutoresizingMaskIntoConstraints="NO" id="Ph3-0i-aKu">
+                                <rect key="frame" x="59" y="258" width="257" height="151"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="0.75294117647058822" blue="0.50196078431372548" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -51,7 +51,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="agama-big" width="257" height="257"/>
+        <image name="komodowallet-big" width="257" height="151"/>
         <image name="wallpaper-welcome" width="964" height="736"/>
     </resources>
 </document>
