@@ -1520,7 +1520,7 @@
                             <rect key="frame" x="138.5" y="13" width="98" height="18"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" image="breadwallet-white" translatesAutoresizingMaskIntoConstraints="NO" id="VBZ-P3-o77">
+                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" image="komodowallet-white" translatesAutoresizingMaskIntoConstraints="NO" id="VBZ-P3-o77">
                                     <rect key="frame" x="0.0" y="0.0" width="98" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 </imageView>
@@ -2724,7 +2724,6 @@ Other devices may be infected.
         </scene>
     </scenes>
     <resources>
-        <image name="breadwallet-white" width="97" height="18"/>
         <image name="burger" width="20" height="16"/>
         <image name="button-bg-blue" width="10" height="11"/>
         <image name="button-bg-blue-pressed" width="10" height="44"/>
@@ -2740,6 +2739,7 @@ Other devices may be infected.
         <image name="flash" width="33" height="33"/>
         <image name="komodowallet" width="93" height="15"/>
         <image name="komodowallet-big" width="257" height="151"/>
+        <image name="komodowallet-white" width="97" height="18"/>
         <image name="lock" width="12" height="16"/>
         <image name="refresh" width="9" height="11"/>
         <image name="wallpaper-default" width="517" height="736"/>
