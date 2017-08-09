@@ -72,7 +72,7 @@
 			<string>com.satindergrewal.agamawalletkmd</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>bread</string>
+				<string>komodowallet</string>
 			</array>
 		</dict>
 		<dict>
