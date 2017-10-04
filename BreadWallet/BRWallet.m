@@ -461,13 +461,14 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 
 uint64_t kmd_interest(uint32_t now,uint32_t txlocktime,uint64_t value)
 {
-    int32_t minutes; uint64_t numerator=0,denominator=0,interest=0;
+    int32_t minutes; uint64_t interest=0;
     if ( (minutes= (now - 777 - txlocktime) / 60) >= 60 )
     {
         if ( minutes > 365 * 24 * 60 )
             minutes = 365 * 24 * 60;
         minutes -= 59;
-        denominator = (((uint64_t)365 * 24 * 60) / minutes);
+        interest = (value * minutes) / 10512000;
+        /*denominator = (((uint64_t)365 * 24 * 60) / minutes);
         if ( denominator == 0 )
             denominator = 1; // max KOMODO_INTEREST per transfer, do it at least annually!
         if ( value > 25000LL*SATOSHIS )
@@ -481,7 +482,7 @@ uint64_t kmd_interest(uint32_t now,uint32_t txlocktime,uint64_t value)
             numerator = (value / 20); // assumes 5%!
             interest = ((numerator * minutes) / ((uint64_t)365 * 24 * 60));
             printf("minutes.%d interest %llu on value %llu\n",minutes,(long long)interest,(long long)value);
-        }
+        }*/
     }
     return(interest);
 }
